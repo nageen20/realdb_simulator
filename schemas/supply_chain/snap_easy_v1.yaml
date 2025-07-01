@@ -1,0 +1,174 @@
+name: SnapSupply Micro Logistics
+tag: supply_chain
+difficulty: easy
+tables:
+  customers:
+    rows: 50
+    columns:
+      id:
+        type: int
+        column_type: pk
+      name:
+        type: name
+      business_name:
+        type: company
+      city:
+        type: city
+      registered_at:
+        type: datetime
+  suppliers:
+    rows: 20
+    columns:
+      id:
+        type: int
+        column_type: pk
+      name:
+        type: company
+      category:
+        type: word
+      location:
+        type: city
+  products:
+    rows: 100
+    columns:
+      id:
+        type: int
+        column_type: pk
+      name:
+        type: word
+      category:
+        type: word
+      unit_price:
+        type: float
+  supplier_products:
+    rows: 200
+    columns:
+      id:
+        type: int
+        column_type: pk
+      supplier_id:
+        type: int
+        column_type: fk
+        references: suppliers.id
+      product_id:
+        type: int
+        column_type: fk
+        references: products.id
+      stock_quantity:
+        type: int
+  orders:
+    rows: 300
+    columns:
+      id:
+        type: int
+        column_type: pk
+      customer_id:
+        type: int
+        column_type: fk
+        references: customers.id
+      order_date:
+        type: datetime
+      status:
+        type: word
+      total_amount:
+        type: float
+  order_items:
+    rows: 1000
+    columns:
+      id:
+        type: int
+        column_type: pk
+      order_id:
+        type: int
+        column_type: fk
+        references: orders.id
+      product_id:
+        type: int
+        column_type: fk
+        references: products.id
+      quantity:
+        type: int
+      unit_price:
+        type: float
+  warehouses:
+    rows: 10
+    columns:
+      id:
+        type: int
+        column_type: pk
+      name:
+        type: word
+      city:
+        type: city
+      capacity:
+        type: int
+  shipments:
+    rows: 300
+    columns:
+      id:
+        type: int
+        column_type: pk
+      order_id:
+        type: int
+        column_type: fk
+        references: orders.id
+      warehouse_id:
+        type: int
+        column_type: fk
+        references: warehouses.id
+      shipped_at:
+        type: datetime
+      delivered_at:
+        type: datetime
+      status:
+        type: word
+  delivery_partners:
+    rows: 15
+    columns:
+      id:
+        type: int
+        column_type: pk
+      name:
+        type: name
+      vehicle_type:
+        type: word
+      phone_number:
+        type: phone_number
+  delivery_assignments:
+    rows: 300
+    columns:
+      id:
+        type: int
+        column_type: pk
+      shipment_id:
+        type: int
+        column_type: fk
+        references: shipments.id
+      partner_id:
+        type: int
+        column_type: fk
+        references: delivery_partners.id
+      assigned_at:
+        type: datetime
+      completed_at:
+        type: datetime
+  product_reviews:
+    rows: 100
+    columns:
+      id:
+        type: int
+        column_type: pk
+      customer_id:
+        type: int
+        column_type: fk
+        references: customers.id
+      product_id:
+        type: int
+        column_type: fk
+        references: products.id
+      rating:
+        type: int
+      comment:
+        type: word
+      reviewed_at:
+        type: datetime

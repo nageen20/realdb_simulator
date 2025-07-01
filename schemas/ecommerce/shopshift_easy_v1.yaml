@@ -1,0 +1,96 @@
+name: ShopSwift (Easy)
+tag: ecommerce
+difficulty: easy
+
+tables:
+  customers:
+    rows: 100
+    columns:
+      id: {type: int, column_type: pk}
+      name: {type: name}
+      email: {type: email}
+      phone: {type: phone_number}
+      signup_date: {type: date}
+
+  products:
+    rows: 50
+    columns:
+      id: {type: int, column_type: pk}
+      name: {type: product_name}
+      category: {type: category}
+      price: {type: float}
+      stock_quantity: {type: int}
+
+  orders:
+    rows: 300
+    columns:
+      id: {type: int, column_type: pk}
+      customer_id: {type: int, column_type: fk, references: customers.id}
+      order_date: {type: datetime}
+      status: {type: order_status}
+      total_amount: {type: float}
+
+  order_items:
+    rows: 900
+    columns:
+      id: {type: int, column_type: pk}
+      order_id: {type: int, column_type: fk, references: orders.id}
+      product_id: {type: int, column_type: fk, references: products.id}
+      quantity: {type: int}
+      price_per_unit: {type: float}
+
+  addresses:
+    rows: 120
+    columns:
+      id: {type: int, column_type: pk}
+      customer_id: {type: int, column_type: fk, references: customers.id}
+      street: {type: street_address}
+      city: {type: city}
+      state: {type: state}
+      postal_code: {type: postal_code}
+      country: {type: country}
+
+  payments:
+    rows: 300
+    columns:
+      id: {type: int, column_type: pk}
+      order_id: {type: int, column_type: fk, references: orders.id}
+      payment_date: {type: datetime}
+      method: {type: payment_method}
+      amount: {type: float}
+      status: {type: payment_status}
+
+  reviews:
+    rows: 200
+    columns:
+      id: {type: int, column_type: pk}
+      product_id: {type: int, column_type: fk, references: products.id}
+      customer_id: {type: int, column_type: fk, references: customers.id}
+      rating: {type: int}
+      review_text: {type: text}
+      review_date: {type: date}
+
+  carts:
+    rows: 80
+    columns:
+      id: {type: int, column_type: pk}
+      customer_id: {type: int, column_type: fk, references: customers.id}
+      created_at: {type: datetime}
+      updated_at: {type: datetime}
+
+  cart_items:
+    rows: 160
+    columns:
+      id: {type: int, column_type: pk}
+      cart_id: {type: int, column_type: fk, references: carts.id}
+      product_id: {type: int, column_type: fk, references: products.id}
+      quantity: {type: int}
+
+  shipments:
+    rows: 300
+    columns:
+      id: {type: int, column_type: pk}
+      order_id: {type: int, column_type: fk, references: orders.id}
+      shipped_date: {type: datetime}
+      carrier: {type: shipping_carrier}
+      tracking_number: {type: tracking_number}
