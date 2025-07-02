@@ -13,7 +13,7 @@ from core.generate_erd import generate_erd
 SCHEMAS_DIR = Path("schemas")
 CONTEXT_DIR = Path("business_context")
 
-st.set_page_config(page_title="Select Project", page_icon="🌍",layout="wide")
+st.set_page_config(page_title="Home", page_icon="🏠",layout="wide")
 
 if "active_project" not in st.session_state:
     st.session_state.active_project = None
@@ -51,6 +51,8 @@ if selected_project is not None:
     st.session_state.schema_path = schema_path
 
 
+    if st.button("Generate Data 🚀"):
+        st.switch_page("pages/1 📈 Data Generator.py")
 
     # --- 3. Load Schema YAML ---
     with open(schema_path, "r") as f:
@@ -63,7 +65,7 @@ if selected_project is not None:
 
 
     # --- 4. Show Business Context (Markdown) ---
-    with st.expander("📖 Business Context", expanded=False):
+    with st.expander("📖 Business Context (Expand for full business context)", expanded=False):
         if context_path.exists():
             with open(context_path, "r", encoding="utf-8") as f:
                 st.markdown(f.read(), unsafe_allow_html=True)
