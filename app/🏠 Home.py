@@ -8,6 +8,9 @@ path = str(Path(Path(__file__).parent.absolute()).parent.absolute())
 sys.path.insert(0, path)
 from core.schemas_loader import load_all_schemas
 from core.generate_erd import generate_erd
+from utils.projects_loader import load_project_index
+from utils.projects_loader import load_context
+from utils.projects_loader import load_schema
 
 # Paths
 SCHEMAS_DIR = Path("schemas")
@@ -24,63 +27,68 @@ if "schema" not in st.session_state:
 if "schema_path" not in st.session_state:
     st.session_state.schema_path = None
 
-if "project_meta" not in st.session_state:
-    st.session_state.project_meta = None
 
 
 st.title("📦 RealDB Playground")
 st.markdown("Simulate real-world OLTP databases with rich schema and business context.")
 
 
-# 1. Load all schemas
-schema_map = load_all_schemas()
-if not schema_map:
+# 1. Load all projects
+
+project_index = load_project_index()
+project_display_names = [
+    f"{proj['emoji']} {proj['name']} ({proj['difficulty'].capitalize()})"
+    for proj in project_index
+]
+
+#schema_map = load_all_schemas()
+if not project_display_names:
     st.error("No schema files found in /schemas.")
     st.stop()
 
+
 # --- 2. Project Selector ---
 
-selected_project = st.selectbox("📁 Select a schema project:", list(schema_map.keys()), width=500, placeholder='Select a project...',index=None)
+selected_project_display = st.selectbox("📁 Select a schema project:", 
+                                        project_display_names, 
+                                        width=500, 
+                                        placeholder='Select a project...',
+                                        index=None)
 
-if selected_project is not None:
-    st.session_state.schema_path = schema_map[selected_project]
-    st.session_state.active_project = selected_project
-    schema_path = schema_map[selected_project].get('path')
-    head, tail = os.path.split(schema_path)
-    context_path = CONTEXT_DIR / head.replace("schemas\\","") / tail.replace(".yaml", ".md")
-    st.session_state.schema_path = schema_path
+st.session_state.active_project = selected_project_display
+if selected_project_display is not None:
+    selected_project = next(
+    proj for proj, display in zip(project_index, project_display_names)
+    if display == selected_project_display  
+    )
 
+
+    st.session_state.schema_path = selected_project
+    
 
     if st.button("Generate Data 🚀"):
         st.switch_page("pages/1 📈 Data Generator.py")
 
-    # --- 3. Load Schema YAML ---
-    with open(schema_path, "r") as f:
-        schema = yaml.safe_load(f)
-
-    st.subheader(f"🧠 Project: {schema.get('name', 'Unnamed')}")
-    st.markdown(f"**Domain:** `{schema.get('tag')}` &nbsp;&nbsp;&nbsp;&nbsp; **Difficulty:** `{schema.get('difficulty')}`")
 
 
+    st.markdown(f"### {selected_project['emoji']} {selected_project['name']}")
+    st.markdown(f"**Difficulty:** {selected_project['difficulty'].capitalize()}")
 
-
+    
     # --- 4. Show Business Context (Markdown) ---
     with st.expander("📖 Business Context (Expand for full business context)", expanded=False):
-        if context_path.exists():
-            with open(context_path, "r", encoding="utf-8") as f:
-                st.markdown(f.read(), unsafe_allow_html=True)
+        context=load_context(selected_project)
+        if context:
+            st.markdown(context)
         else:
             st.warning("No business context found.")
 
 
 
-
-
-
     # --- 5. Generate ERD ---
 
-
-
+    schema=load_schema(selected_project)
+    st.session_state.schema = schema
     st.subheader("🧩 Entity Relationship Diagram (ERD)")
     st.graphviz_chart(generate_erd(schema), use_container_width=True)
 
