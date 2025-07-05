@@ -9,6 +9,7 @@ sys.path.insert(0, path)
 from core.schemas_loader import load_all_schemas
 from core.generate_erd import generate_erd
 from core.erd_builder.erd_generator import generate_erd_from_schema
+from core.erd_builder.pretty_erd_generator import generate_pretty_erd
 from utils.projects_loader import load_project_index
 from utils.projects_loader import load_context
 from utils.projects_loader import load_schema
@@ -103,7 +104,7 @@ if selected_project_display is not None:
     schema=load_schema(selected_project)
     st.session_state.schema = schema
     st.subheader("🧩 Entity Relationship Diagram (ERD)")
-    st.graphviz_chart(generate_erd_from_schema(schema), use_container_width=True)
+    st.graphviz_chart(generate_pretty_erd(schema), use_container_width=True)
 
     # --- 6. Load data dir ---
     st.session_state.data_path = load_data_dir(selected_project)

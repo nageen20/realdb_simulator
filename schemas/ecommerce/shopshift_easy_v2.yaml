@@ -10,7 +10,7 @@ tables:
     columns:
       id:
         type: int
-        data_type: int
+        data_type: INT
 
       name:
         type: name
@@ -37,7 +37,7 @@ tables:
     columns:
       id: 
         type: int 
-        data_type: int
+        data_type: INT
       
       product_category: 
         type: fetch_from_file
@@ -62,7 +62,7 @@ tables:
 
       stock_quantity: 
         type: random_int
-        data_type: int
+        data_type: INT
         distribution: log
         min: 200
         max: 1200
@@ -75,15 +75,15 @@ tables:
     columns:
       id: 
         type: int 
-        data_type: int
+        data_type: INT
 
       customer_id: 
         type: int 
-        data_type: int
+        data_type: INT
 
       order_date: 
         type: date_time_between
-        data_type: datetime
+        data_type: DATETIME
         min: cutomers.signup_date
         max: "today"
 
@@ -111,19 +111,19 @@ tables:
     columns:
       id: 
         type: int 
-        data_type: int
+        data_type: INT
 
       order_id: 
         type: int 
-        data_type: int
+        data_type: INT
 
       product_id: 
         type: int 
-        data_type: int
+        data_type: INT
 
       quantity: 
         type: random_int
-        data_type: int
+        data_type: INT
         min: 1
         max: 5
 
@@ -145,25 +145,25 @@ tables:
     columns:
       id: 
         type: int
-        data_type: int
+        data_type: INT
 
       customer_id: 
         type: int 
-        data_type: int
+        data_type: INT
 
       city: 
         type: city
-        data_type: text
+        data_type: TEXT
         group: location
 
       state: 
         type: state
-        data_type: text
+        data_type: TEXT
         group: location
 
       country: 
         type: country
-        data_type: text
+        data_type: TEXT
         group: location
 
     primary_key: [id]
@@ -177,15 +177,15 @@ tables:
     columns:
       id: 
         type: int
-        data_type: int
+        data_type: INT
 
       order_id: 
         type: int
-        data_type: int
+        data_type: INT
 
       payment_date: 
         type: date_time_between
-        data_type: datetime
+        data_type: DATETIME
         depends_on: orders.order_date
 
       method: 
@@ -225,29 +225,29 @@ tables:
     columns:
       id: 
         type: int
-        data_type: int
+        data_type: INT
 
       product_id: 
         type: int
-        data_type: int
+        data_type: INT
 
       customer_id: 
         type: int
-        data_type: int
+        data_type: INT
 
       rating: 
         type: weighted_enum
-        data_type: int
+        data_type: INT
         values: [5, 4, 3, 2, 1]
         weights: [0.55, 0.25, 0.08, 0.07, 0.05] 
 
       review_text: 
         type: review_text
-        data_type: text
+        data_type: TEXT
 
       review_date: 
         type: date_between
-        data_type: date
+        data_type: DATE
         min: orders.order_date
         max: "+60d"
 
@@ -263,21 +263,21 @@ tables:
     columns:
       id: 
         type: int
-        data_type: int
+        data_type: INT
 
       customer_id: 
         type: int
-        data_type: int
+        data_type: INT
 
       created_at: 
         type: date_time_between
-        data_type: datetime
+        data_type: DATETIME
         min: customers.signup_date
         max: "now"
 
       updated_at: 
         type: date_time_between
-        data_type: datetime
+        data_type: DATETIME
         min: carts.created_at
         max: "now"
     
@@ -291,19 +291,19 @@ tables:
     columns:
       id: 
         type: int
-        data_type: int
+        data_type: INT
       
       cart_id: 
         type: int
-        data_type: int
+        data_type: INT
       
       product_id: 
         type: int 
-        data_type: int
+        data_type: INT
       
       quantity:
         type: random_int
-        data_type: int
+        data_type: INT
         min: 1
         max: 5
     
@@ -318,15 +318,15 @@ tables:
     columns:
       id: 
         type: int
-        data_type: int
+        data_type: INT
 
       order_id: 
         type: int
-        data_type: int
+        data_type: INT
 
       shipped_date: 
         type: datetime
-        data_type: datetime
+        data_type: DATETIME
         min: orders.order_date
         max: "now"
 
