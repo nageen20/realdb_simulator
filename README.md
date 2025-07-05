@@ -54,6 +54,7 @@ pip install -r requirements.txt
 ```
 
 ## 📁 Project Structure (Simplified)
+```
 realdb-simulator/
 ├── app/                     # Streamlit UI files
 ├── core/
@@ -66,6 +67,7 @@ realdb-simulator/
 ├── data/                    # Lookup CSVs, hierarchies, etc.
 ├── requirements.txt
 └── README.md
+```
 
 ## 🖥️ Run the Streamlit App
 Use the following command to launch the main Streamlit interface:
