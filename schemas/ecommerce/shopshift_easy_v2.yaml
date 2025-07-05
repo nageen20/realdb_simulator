@@ -1,0 +1,348 @@
+name: ShopSwift (Easy)
+tag: ecommerce
+difficulty: easy
+
+tables:
+
+  customers:
+    rows: 100
+    distribution:
+    columns:
+      id:
+        type: int
+        data_type: int
+
+      name:
+        type: name
+        data_type: VARCHAR(200)
+
+      email: 
+        type: email
+        data_type: VARCHAR(300)
+
+      phone:
+        type: phone_number
+        data_type: VARCHAR(300)
+
+      signup_date:
+        type: date_between
+        data_type: DATE
+        start_date: "-365d"
+        end_date: "today"
+    
+    primary_key: [id]
+
+  products:
+    rows: 100
+    columns:
+      id: 
+        type: int 
+        data_type: int
+      
+      product_category: 
+        type: fetch_from_file
+        data_type: VARCHAR(300)
+        source_file: product_hierarchy.csv
+        group: product_hierarchy
+
+      product_name: 
+        type: fetch_from_file
+        data_type: VARCHAR(300)
+        depends_on: product_category
+        dependent_formula: hierarchy
+        source_file: product_hierarchy.csv
+        group: product_hierarchy
+      
+      price: 
+        type: pydecimal
+        data_type: DECIMAL(15,4)
+        distribution: gaussian
+        min: 10
+        max: 1000
+
+      stock_quantity: 
+        type: random_int
+        data_type: int
+        distribution: log
+        min: 200
+        max: 1200
+
+    primary_key: [id]
+
+
+  orders:
+    rows: 300
+    columns:
+      id: 
+        type: int 
+        data_type: int
+
+      customer_id: 
+        type: int 
+        data_type: int
+
+      order_date: 
+        type: date_time_between
+        data_type: datetime
+        min: cutomers.signup_date
+        max: "today"
+
+      status:
+        type: weighted_enum 
+        data_type: VARCHAR(50)
+        values: [placed, shipped, delivered, cancelled, pending, failed]
+        weights: [0.35, 0.25, 0.25, 0.05, 0.01, 0.09]
+
+      total_amount: 
+        type: pydecimal
+        data_type: DECIMAL(15,4)
+        min: 10.0
+        max: 10000.0
+        distribution: gaussian
+
+    primary_key: [id]
+
+    foreign_keys:
+      customer_id: customers.id
+
+
+  order_items:
+    rows: 900
+    columns:
+      id: 
+        type: int 
+        data_type: int
+
+      order_id: 
+        type: int 
+        data_type: int
+
+      product_id: 
+        type: int 
+        data_type: int
+
+      quantity: 
+        type: random_int
+        data_type: int
+        min: 1
+        max: 5
+
+      price_per_unit: 
+        type: dependent_column
+        data_type: DECIMAL(15,4)
+        depends_on: products.price
+        dependent_formula: equals
+
+    primary_key: [id]
+
+    foreign_keys:
+      order_id: orders.id
+      product_id: products.id
+
+
+  addresses:
+    rows: 120
+    columns:
+      id: 
+        type: int
+        data_type: int
+
+      customer_id: 
+        type: int 
+        data_type: int
+
+      city: 
+        type: city
+        data_type: text
+        group: location
+
+      state: 
+        type: state
+        data_type: text
+        group: location
+
+      country: 
+        type: country
+        data_type: text
+        group: location
+
+    primary_key: [id]
+
+    foreign_keys:
+      customer_id: customers.id
+
+
+  payments:
+    rows: 300
+    columns:
+      id: 
+        type: int
+        data_type: int
+
+      order_id: 
+        type: int
+        data_type: int
+
+      payment_date: 
+        type: date_time_between
+        data_type: datetime
+        depends_on: orders.order_date
+
+      method: 
+        type: weighted_enum
+        data_type: VARCHAR(200)
+        values: ["UPI","Credit Card", "Debit Card", "Net Banking", "Cash on Delivery", "Wallet (Paytm/PhonePe)", "Buy Now Pay Later"]
+        weights: [0.35, 0.25, 0.15, 0.1, 0.1, 0.03, 0.02]
+
+      amount: 
+        type: dependent_column
+        data_type: DECIMAL(15,4)
+        depends_on: orders.total_amount
+        dependent_formula: equals
+
+      status: 
+        type: dependent_column
+        data_type: VARCHAR(100)
+        depends_on: orders.order_status
+        dependent_formula: conditional
+        conditions:
+          placed: [paid] 
+          shipped: [paid] 
+          delivered: [paid] 
+          cancelled: [refund] 
+          pending: [pending] 
+          failed: [failed]
+
+
+    primary_key: [id]
+
+    foreign_keys:
+      order_id: orders.id
+
+  
+  reviews:
+    rows: 200
+    columns:
+      id: 
+        type: int
+        data_type: int
+
+      product_id: 
+        type: int
+        data_type: int
+
+      customer_id: 
+        type: int
+        data_type: int
+
+      rating: 
+        type: weighted_enum
+        data_type: int
+        values: [5, 4, 3, 2, 1]
+        weights: [0.55, 0.25, 0.08, 0.07, 0.05] 
+
+      review_text: 
+        type: review_text
+        data_type: text
+
+      review_date: 
+        type: date_between
+        data_type: date
+        min: orders.order_date
+        max: "+60d"
+
+    primary_key: [id]
+
+    foreign_keys:
+      product_id: products.id
+      customer_id: customers.id
+
+
+  carts:
+    rows: 80
+    columns:
+      id: 
+        type: int
+        data_type: int
+
+      customer_id: 
+        type: int
+        data_type: int
+
+      created_at: 
+        type: date_time_between
+        data_type: datetime
+        min: customers.signup_date
+        max: "now"
+
+      updated_at: 
+        type: date_time_between
+        data_type: datetime
+        min: carts.created_at
+        max: "now"
+    
+    primary_key: [id]
+
+    foreign_keys:
+      customer_id: customers.id
+
+  cart_items:
+    rows: 160
+    columns:
+      id: 
+        type: int
+        data_type: int
+      
+      cart_id: 
+        type: int
+        data_type: int
+      
+      product_id: 
+        type: int 
+        data_type: int
+      
+      quantity:
+        type: random_int
+        data_type: int
+        min: 1
+        max: 5
+    
+    primary_key: [id]
+
+    foreign_keys:
+      cart_id: carts.id
+      product_id: products.id
+
+  shipments:
+    rows: 300
+    columns:
+      id: 
+        type: int
+        data_type: int
+
+      order_id: 
+        type: int
+        data_type: int
+
+      shipped_date: 
+        type: datetime
+        data_type: datetime
+        min: orders.order_date
+        max: "now"
+
+      carrier: 
+        type: weighted_enum
+        data_type: VARCHAR(300)
+        values: ["FedEx", "UPS", "DHL Express", "USPS", "Blue Dart", "DTDC", "Delhivery", "India Post", "Amazon Logistics", "Ekart Logistics"]
+        weights: [0.2, 0.15, 0.1, 0.1, 0.1, 0.08, 0.08, 0.07, 0.07, 0.05]
+      
+      tracking_number: 
+        type: uuid4
+        data_type: VARCHAR(100)
+
+
+    primary_key: [id]
+
+    foreign_keys:
+      order_id: orders.id
+

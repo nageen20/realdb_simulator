@@ -2,8 +2,9 @@
   {
     "name": "ShopShift",
     "emoji": "🛒",
-    "path": "ecommerce/shopshift_easy_v1.yaml",
+    "path": "ecommerce/shopshift_easy_v2.yaml",
     "context": "ecommerce/shopshift_easy_v1.md",
+    "data": "ecommerce/",
     "tag": "ecommerce",
     "difficulty": "easy"
   },
@@ -12,6 +13,7 @@
     "emoji": "🚚",
     "path": "supply_chain/snap_easy_v1.yaml",
     "context": "supply_chain/snap_easy_v1.md",
+    "data": "supply_chain/",
     "tag": "supply_chain",
     "difficulty": "easy"
   }

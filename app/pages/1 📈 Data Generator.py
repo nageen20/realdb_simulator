@@ -6,11 +6,10 @@ import sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
-from core.data_generator import FakeDataGenerator
-from core.writer_csv import write_csvs
-from core.writer_sql import write_sql_script
-from core.write_to_db import write_to_db
-from utils.projects_loader import load_schema
+
+from utils.build_db_engine import build_db_engine
+from core.output_handlers.factory import get_writer
+from core.services.data_generation_runner import generate_project_data
 
 st.set_page_config(page_title="Mapping Demo", page_icon="📈")
 
@@ -81,35 +80,23 @@ if st.session_state.schema is not None:
 
 
 
-    generator = FakeDataGenerator(schema, row_config)
-    dataframes = generator.generate()
-
-    # Save outputs
-    if db_type=='csv':
-        if st.button("Generate data"):
-            st.info("Generating data...")
-            write_csvs(dataframes)
-            st.success("✅ Data generated!")
-    else:
-        if db_type in ["PostgreSQL", "MySQL"]:
-            
-            
-            sql_generation_type = st.radio(label='Choose how to generate data:',
+    if db_type in ["PostgreSQL", "MySQL"]:
+        sql_generation_type = st.radio(label='Choose how to generate data:',
                                            options=["Generate SQL Insert Scripts","Add to Database Directly"],
                                            index=None,
                                            horizontal=True)
             
             
-            if sql_generation_type=="Add to Database Directly":
+        if sql_generation_type=="Add to Database Directly":
+            output_mode = 'db'
+            st.markdown("### 🔐 Enter Database Credentials")
+            db_host = st.text_input("Host", value="localhost")
+            db_port = st.text_input("Port", value="5432" if db_type == "PostgreSQL" else "3306")
+            db_user = st.text_input("Username")
+            db_password = st.text_input("Password", type="password")
+            db_name = st.text_input("Database name")
 
-                st.markdown("### 🔐 Enter Database Credentials")
-                db_host = st.text_input("Host", value="localhost")
-                db_port = st.text_input("Port", value="5432" if db_type == "PostgreSQL" else "3306")
-                db_user = st.text_input("Username")
-                db_password = st.text_input("Password", type="password")
-                db_name = st.text_input("Database name")
-
-                st.session_state.db_credentials = {
+            st.session_state.db_credentials = {
                     "type": db_type.lower(),
                     "host": db_host,
                     "port": db_port,
@@ -117,20 +104,44 @@ if st.session_state.schema is not None:
                     "password": db_password,
                     "database": db_name,
                 }
-                if st.button("Populate Data"):
-                    st.info("Generating data...")
-                    insert_status = write_to_db(dataframes, schema, st.session_state.db_credentials, db_flavor=db_flavor)
-                    if insert_status=='success':
-                        st.success("✅ Data successfully inserted into the database!")
-                    else:
-                        st.error(f"❌ Database error: {insert_status}")
             
-            if sql_generation_type=="Generate SQL Insert Scripts":
-                st.info("Generating data...")
-                write_sql_script(dataframes, schema, db_flavor=db_flavor)
+            if st.button("🚀 Generate Data"):
+                engine = build_db_engine(st.session_state.db_credentials)
+                writer = get_writer(output_mode, db_engine=engine)
 
-                st.success("✅ Data generated!")
-    #st.rerun()
+                 # Generate & write data
+                st.write("⏳ Generating...")
+                generate_project_data(schema, writer, st.session_state.data_path)
+                st.success("✅ Data generation complete!")
+        elif sql_generation_type == 'Generate SQL Insert Scripts':
+            # Optional output path for csv or sql
+            output_path = st.text_input("Output Path", "output")
+            
+            if st.button("🚀 Generate Data"):
+                output_mode = 'sql'
+                 # Get the writer
+                writer = get_writer(output_mode, output_path=output_path)
+
+                # Generate & write data
+                st.write("⏳ Generating...")
+                generate_project_data(schema, writer, st.session_state.data_path)
+                st.success("✅ Data generation complete!")
+
+    elif db_type == 'csv':
+        # Optional output path for csv or sql
+        output_path = st.text_input("Output Path", "output")
+
+        if st.button("🚀 Generate Data"):
+            output_mode = 'csv'
+                # Get the writer
+            writer = get_writer(output_mode, output_path=output_path)
+
+            # Generate & write data
+            st.write("⏳ Generating...")
+            generate_project_data(schema, writer, st.session_state.data_path)
+            st.success("✅ Data generation complete!")
+
+
     
 else:
     st.title(f"🛠️ No project selected")

@@ -22,3 +22,8 @@ def load_context(project):
     context_path = context_path.as_posix()
     with open(context_path, "r", encoding="utf-8") as f:
         return f.read()
+
+def load_data_dir(project):
+    data_path = Path("data") / Path(project["data"])
+    data_path = data_path.as_posix()
+    return data_path

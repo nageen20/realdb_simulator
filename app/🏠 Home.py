@@ -8,13 +8,23 @@ path = str(Path(Path(__file__).parent.absolute()).parent.absolute())
 sys.path.insert(0, path)
 from core.schemas_loader import load_all_schemas
 from core.generate_erd import generate_erd
+from core.erd_builder.erd_generator import generate_erd_from_schema
 from utils.projects_loader import load_project_index
 from utils.projects_loader import load_context
 from utils.projects_loader import load_schema
+from utils.projects_loader import load_data_dir
+
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,  # or INFO in production
+    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+)
 
 # Paths
 SCHEMAS_DIR = Path("schemas")
 CONTEXT_DIR = Path("business_context")
+DATA_DIR = Path("data")
 
 st.set_page_config(page_title="Home", page_icon="🏠",layout="wide")
 
@@ -26,6 +36,9 @@ if "schema" not in st.session_state:
 
 if "schema_path" not in st.session_state:
     st.session_state.schema_path = None
+
+if "data_path" not in st.session_state:
+    st.session_state.data_path = None
 
 
 
@@ -90,5 +103,8 @@ if selected_project_display is not None:
     schema=load_schema(selected_project)
     st.session_state.schema = schema
     st.subheader("🧩 Entity Relationship Diagram (ERD)")
-    st.graphviz_chart(generate_erd(schema), use_container_width=True)
+    st.graphviz_chart(generate_erd_from_schema(schema), use_container_width=True)
+
+    # --- 6. Load data dir ---
+    st.session_state.data_path = load_data_dir(selected_project)
 
