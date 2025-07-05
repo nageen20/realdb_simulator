@@ -24,6 +24,20 @@ faker = get_faker()
 logger = logging.getLogger(__name__)
 
 class TableDataGenerator:
+    """
+    Generates rows for a single table using the specified field generators.
+
+    - Initializes all field generators.
+    - Ensures relationships are respected (PK, FK).
+    - Uses faker, enums, dependency rules, and lookups for value generation.
+    
+    Args:
+        table_name (str): Table name.
+        table_config (dict): Config dictionary from YAML.
+        global_data_dir (Path): Path to CSV files.
+        fk_lookup (dict): Foreign key mapping used across tables.
+    """
+    
     def __init__(self, table_name, table_config, global_data_dir, fk_lookup=None):
         self.table_name = table_name
         self.columns = table_config['columns']

@@ -2,6 +2,26 @@ from .base_generator import BaseFieldGenerator
 import random
 
 class ReviewTextGenerator(BaseFieldGenerator):
+    """
+    Generates a realistic review text based on the rating value of a product or service.
+
+    This generator selects a review template based on the sentiment implied by the `rating` column:
+    - If rating is 4 or 5 → chooses from positive reviews.
+    - If rating is 3 → chooses from neutral reviews.
+    - If rating is 1 or 2 → chooses from negative reviews.
+    - If no rating is present, defaults to a random rating between 1 and 5.
+
+    This is useful for simulating user-generated review content for e-commerce, service platforms, etc.
+
+    Attributes:
+        POSITIVE_TEMPLATES (List[str]): Sample reviews for positive sentiment.
+        NEGATIVE_TEMPLATES (List[str]): Sample reviews for negative sentiment.
+        NEUTRAL_TEMPLATES (List[str]): Sample reviews for neutral sentiment.
+
+    Example Usage:
+        If row_data = {'rating': 5}, this generator will return a randomly chosen positive review string.
+    """
+    
     POSITIVE_TEMPLATES = [
         "Absolutely loved this product! It exceeded my expectations.",
         "Works great, very satisfied with the quality.",

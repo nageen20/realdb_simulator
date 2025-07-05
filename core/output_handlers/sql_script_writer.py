@@ -4,6 +4,27 @@ from core.output_handlers.base import BaseOutputWriter
 import pandas as pd
 
 class SQLScriptWriter(BaseOutputWriter):
+    """
+    Generates `.sql` scripts containing INSERT statements for each table.
+
+    Useful when learners want to inspect or run SQL manually in a client.
+
+    Parameters:
+        output_path (str or Path): Directory to save the `.sql` files.
+
+    Methods:
+        write(table_name: str, dataframe: pd.DataFrame):
+            Generates and writes SQL INSERT statements to `table_name.sql`.
+
+    Notes:
+        - Strings are escaped to prevent syntax errors.
+        - Dates and NULLs are formatted properly.
+        - Multiline INSERTs are batched for better readability.
+
+    Example:
+        writer = SQLScriptWriter("scripts/")
+        writer.write("products", df)
+    """
     def __init__(self, output_path):
         self.output_path = output_path
         os.makedirs(self.output_path, exist_ok=True)

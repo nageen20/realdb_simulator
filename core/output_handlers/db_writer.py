@@ -3,6 +3,28 @@ from sqlalchemy.engine import Engine
 from core.output_handlers.base import BaseOutputWriter
 
 class DatabaseWriter(BaseOutputWriter):
+    """
+    Writes data directly into a live SQL database (PostgreSQL, MySQL, SQLite, etc.).
+
+    Parameters:
+        db_url (str): SQLAlchemy-compatible database URI.
+        if_exists (str): What to do if the table already exists.
+                         Options: 'fail', 'replace', 'append'. Default is 'replace'.
+
+    Methods:
+        write(table_name: str, dataframe: pd.DataFrame):
+            Uses pandas `.to_sql()` to insert data into the specified table.
+
+    Example:
+        writer = DatabaseWriter("postgresql://user:pass@localhost/db")
+        writer.write("customers", df)
+
+    Notes:
+        - Make sure the database is running and accessible.
+        - SQLAlchemy and pandas handle datatype inference.
+        - Performance can be tuned with `chunksize`, `method='multi'`, etc.
+    """
+
     def __init__(self, engine: Engine, if_exists: str = "replace"):
         """
         Parameters:

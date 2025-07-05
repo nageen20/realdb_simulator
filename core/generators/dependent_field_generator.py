@@ -3,6 +3,21 @@ import random
 import pandas as pd
 
 class DependentFieldGenerator(BaseFieldGenerator):
+    """
+    Generates values that depend on another column's value.
+
+    Supports:
+    - 'equals': Return the same value as the dependent column.
+    - 'pandas': Evaluate a pandas expression provided in 'formula'.
+    - 'hierarchy': Filter values based on parent-child mapping in CSV.
+    - 'conditional': Use a mapping of parent values to allowed options.
+
+    Args:
+        field_name (str): Field being generated.
+        config (dict): Field config from YAML.
+        lookup_df (pd.DataFrame): Loaded file with dependency mappings.
+    """
+
     def __init__(self, field_name, config, lookup_df):
         super().__init__(field_name, config)
         self.lookup_df = lookup_df
