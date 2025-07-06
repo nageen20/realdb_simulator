@@ -17,7 +17,7 @@ class SimpleFakerFieldGenerator(BaseFieldGenerator):
     phone numbers, emails, integers, floats, and dates.
 
     It supports:
-    - Simple faker types like `email`, `uuid4`, `phone_number`, `name`.
+    - Simple faker types like `email`, `uuid4`, `phone_number`, `name`. `company`, `city`.
     - Range-based values for numeric and datetime types.
     - Boundaries (`min`, `max`, `start_date`, `end_date`) that can:
         • be static values
@@ -111,7 +111,7 @@ class SimpleFakerFieldGenerator(BaseFieldGenerator):
 
                 return faker_fn(start_date=start_date, end_date=end_date)
             
-            elif self.config['type'] in ['phone_number','email','name','uuid4']:
+            elif self.config['type'] in ['phone_number','email','name','uuid4','company','city']:
                 return faker_fn()
 
             return faker_fn()

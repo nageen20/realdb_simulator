@@ -1,0 +1,284 @@
+name: SnapSupply Micro Logistics
+tag: supply_chain
+difficulty: easy
+
+tables:
+
+  customers:
+    rows: 50
+    columns:
+      id:
+        type: int
+        data_type: INT
+        column_type: pk
+      name:
+        type: name
+        data_type: VARCHAR(200)
+      business_name:
+        type: company
+        data_type: VARCHAR(200)
+      city:
+        type: city
+        data_type: VARCHAR(100)
+      registered_at:
+        type: datetime
+        data_type: DATETIME
+    primary_key: [id]
+
+  suppliers:
+    rows: 20
+    columns:
+      id:
+        type: int
+        data_type: INT
+      name:
+        type: company
+        data_type: VARCHAR(200)
+      category:
+        type: weighted_enum
+        data_type: VARCHAR(100)
+        values: ["Packaging", "Raw Materials", "Machinery", "Transportation", "Electronics"]
+        weights: [0.3, 0.25, 0.2, 0.15, 0.1]
+      location:
+        type: city
+        data_type: VARCHAR(100)
+    primary_key: [id]
+
+  products:
+    rows: 100
+    columns:
+      id:
+        type: int
+        data_type: INT
+        column_type: pk
+      product_category:
+        type: fetch_from_file
+        data_type: VARCHAR(200)
+        source_file: supply_chain_products.csv
+        group: product_hierarchy
+      product_name:
+        type: fetch_from_file
+        data_type: VARCHAR(200)
+        depends_on: product_category
+        dependent_formula: hierarchy
+        source_file: supply_chain_products.csv
+        group: product_hierarchy
+      unit_price:
+        type: pydecimal
+        data_type: DECIMAL(10,2)
+        min: 10.0
+        max: 1000.0
+        distribution: gaussian
+      created_at:
+        type: date_between
+        data_type: DATE
+        start_date: "-365d"
+        end_date: "now"
+    primary_key: [id]
+
+  supplier_products:
+    rows: 200
+    columns:
+      id:
+        type: int
+        data_type: INT
+        
+      supplier_id:
+        type: int
+        data_type: INT
+        
+      product_id:
+        type: int
+        data_type: INT
+        
+      stock_quantity:
+        type: random_int
+        data_type: INT
+        min: 50
+        max: 500
+    primary_key: [id]
+    foreign_keys:
+      supplier_id: suppliers.id
+      product_id: products.id
+
+  orders:
+    rows: 300
+    columns:
+      id:
+        type: int
+        data_type: INT
+        
+      customer_id:
+        type: int
+        data_type: INT
+       
+      order_date:
+        type: datetime
+        data_type: DATETIME
+      status:
+        type: weighted_enum
+        data_type: VARCHAR(100)
+        values: [placed, shipped, delivered, cancelled, pending, failed]
+        weights: [0.35, 0.25, 0.25, 0.05, 0.01, 0.09]
+      total_amount:
+        type: pydecimal
+        data_type: DECIMAL(10,2)
+        min: 100.0
+        max: 5000.0
+        distribution: gaussian
+    primary_key: [id]
+    foreign_keys:
+      customer_id: customers.id
+
+  order_items:
+    rows: 1000
+    columns:
+      id:
+        type: int
+        data_type: INT
+      order_id:
+        type: int
+        data_type: INT
+      product_id:
+        type: int
+        data_type: INT
+      quantity:
+        type: random_int
+        data_type: INT
+        min: 1
+        max: 10
+      unit_price:
+        type: dependent_column
+        data_type: DECIMAL(10,2)
+        depends_on: products.unit_price
+        dependent_formula: equals
+    primary_key: [id]
+    foreign_keys:
+      order_id: orders.id
+      product_id: products.id
+
+  warehouses:
+    rows: 10
+    columns:
+      id:
+        type: int
+        data_type: INT
+      name:
+        type: company
+        data_type: VARCHAR(100)
+      city:
+        type: city
+        data_type: VARCHAR(100)
+      capacity:
+        type: random_int
+        data_type: INT
+        min: 1000
+        max: 10000
+    primary_key: [id]
+
+  shipments:
+    rows: 300
+    columns:
+      id:
+        type: int
+        data_type: INT
+      order_id:
+        type: int
+        data_type: INT
+      warehouse_id:
+        type: int
+        data_type: INT
+      shipped_at:
+        type: datetime
+        data_type: DATETIME
+      delivered_at:
+        type: datetime
+        data_type: DATETIME
+      status:
+        type: weighted_enum
+        data_type: VARCHAR(100)
+        values: [packaged, dispatched, in-transit, delivered, returned]
+        weights: [0.1, 0.2, 0.15, 0.5, 0.05]
+    primary_key: [id]
+    foreign_keys:
+      order_id: orders.id
+      warehouse_id: warehouses.id
+
+  delivery_partners:
+    rows: 15
+    columns:
+      id:
+        type: int
+        data_type: INT
+        column_type: pk
+      name:
+        type: company
+        data_type: VARCHAR(100)
+      vehicle_type:
+        type: weighted_enum
+        data_type: VARCHAR(100)
+        values: ["Mini Truck","Pickup Van", "Delivery Van", "Cargo Van", "Tempo", "Container Truck", "Refrigerated Truck", "Freight Train", "Cargo Ship"]
+        weights: [0.2, 0.15, 0.2, 0.08, 0.1, 0.05, 0.1, 0.06, 0.06]
+      phone_number:
+        type: phone_number
+        data_type: VARCHAR(100)
+    primary_key: [id]
+
+  delivery_assignments:
+    rows: 300
+    columns:
+      id:
+        type: int
+        data_type: INT
+
+      shipment_id:
+        type: int
+        data_type: INT
+
+      partner_id:
+        type: int
+        data_type: INT
+
+      assigned_at:
+        type: datetime
+        data_type: DATETIME
+      completed_at:
+        type: datetime
+        data_type: DATETIME
+    primary_key: [id]
+    foreign_keys:
+      shipment_id: shipments.id
+      partner_id: delivery_partners.id
+
+  product_reviews:
+    rows: 100
+    columns:
+      id:
+        type: int
+        data_type: INT
+ 
+      customer_id:
+        type: int
+        data_type: INT
+
+      product_id:
+        type: int
+        data_type: INT
+
+      rating:
+        type: weighted_enum
+        data_type: INT
+        values: [5, 4, 3, 2, 1]
+        weights: [0.5, 0.25, 0.15, 0.05, 0.05]
+      comment:
+        type: review_text
+        data_type: TEXT
+      reviewed_at:
+        type: date_between
+        data_type: DATE
+        start_date: "-365d"
+        end_date: "now"
+    primary_key: [id]
+    foreign_keys:
+      customer_id: customers.id
+      product_id: products.id
