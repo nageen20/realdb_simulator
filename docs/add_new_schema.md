@@ -164,7 +164,7 @@ tables:                                     # Start adding tables below
     ```
 5. Run the app using:
     ```bash
-    streamlit run app/1 📍 Overview.py
+    streamlit run app/🏠 Home.py
     ```
 
 ---
