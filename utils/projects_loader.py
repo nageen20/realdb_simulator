@@ -18,7 +18,7 @@ def load_schema(project):
         return yaml.safe_load(f)
 
 def load_context(project):
-    context_path = Path("business_context") / Path(project["context"])
+    context_path = Path("context") / Path(project["context"])
     context_path = context_path.as_posix()
     with open(context_path, "r", encoding="utf-8") as f:
         return f.read()

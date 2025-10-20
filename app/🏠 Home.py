@@ -6,8 +6,8 @@ import sys
 
 path = str(Path(Path(__file__).parent.absolute()).parent.absolute())
 sys.path.insert(0, path)
-from core.schemas_loader import load_all_schemas
-from core.generate_erd import generate_erd
+#from core.schemas_loader import load_all_schemas
+#from core.generate_erd import generate_erd
 from core.erd_builder.erd_generator import generate_erd_from_schema
 from core.erd_builder.pretty_erd_generator import generate_pretty_erd
 from utils.projects_loader import load_project_index
@@ -24,7 +24,7 @@ logging.basicConfig(
 
 # Paths
 SCHEMAS_DIR = Path("schemas")
-CONTEXT_DIR = Path("business_context")
+CONTEXT_DIR = Path("context")
 DATA_DIR = Path("data")
 
 st.set_page_config(page_title="Home", page_icon="🏠",layout="wide")

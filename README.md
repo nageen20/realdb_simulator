@@ -72,6 +72,6 @@ realdb-simulator/
 ## 🖥️ Run the Streamlit App
 Use the following command to launch the main Streamlit interface:
 ```
-streamlit run app/🏠 Home.py
+streamlit run '.\app\🏠 Home.py'
 
 ```
